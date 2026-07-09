@@ -1,5 +1,11 @@
 # @voyant-travel/plugin-netopia
 
+## 0.105.19
+
+### Patch Changes
+
+- cae9d71: Export `voyantPlugin` from the package entrypoint so source-free managed profiles can resolve the Netopia plugin by bare package specifier.
+
 ## 0.105.18
 
 ### Patch Changes
