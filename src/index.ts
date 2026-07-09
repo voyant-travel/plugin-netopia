@@ -21,6 +21,7 @@ export {
   netopiaHonoBundle,
   netopiaHonoPlugin as createNetopiaAdapterBundle,
   netopiaHonoPlugin,
+  netopiaHonoPlugin as voyantPlugin,
 } from "./plugin.js"
 export {
   deriveNetopiaOrderId,

@@ -5,6 +5,7 @@ import { notificationsService } from "@voyant-travel/notifications"
 import { Hono } from "hono"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { NetopiaClientApi } from "../../src/client.js"
+import { voyantPlugin } from "../../src/index.js"
 import {
   NETOPIA_RUNTIME_CONTAINER_KEY,
   netopiaHonoBundle,
@@ -87,6 +88,10 @@ describe("netopiaHonoPlugin.bootstrap", () => {
   it("exposes the bundle alias", () => {
     const bundle = netopiaHonoBundle()
     expect(bundle.name).toBe("netopia")
+  })
+
+  it("exposes a managed-profile resolver alias from the package entrypoint", () => {
+    expect(voyantPlugin).toBe(netopiaHonoPlugin)
   })
 
   it("validates and registers the resolved runtime once", async () => {
