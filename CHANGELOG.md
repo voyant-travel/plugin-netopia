@@ -1,5 +1,13 @@
 # @voyant-travel/plugin-netopia
 
+## 0.105.20
+
+### Patch Changes
+
+- 013e2d8: Publish an import-cheap `./voyant` deployment manifest with Netopia's finance
+  admin routes, verified callback surface, runtime requirements, and package
+  compatibility metadata.
+
 ## 0.105.19
 
 ### Patch Changes
