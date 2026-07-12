@@ -1,8 +1,28 @@
 import { describe, expect, it } from "vitest"
 
+import netopiaAdminOpenApi from "../../openapi/admin/netopia.json"
 import packageJson from "../../package.json"
 import { createNetopiaFinanceRoutes, NETOPIA_ADMIN_OPENAPI_API_ID } from "../../src/plugin.js"
 import netopiaVoyantPlugin from "../../src/voyant.js"
+
+function expectTemplatedPathsToDeclareParameters(document: {
+  paths?: Record<string, Record<string, { parameters?: unknown[] }>>
+}) {
+  for (const [path, pathItem] of Object.entries(document.paths ?? {})) {
+    const parameterNames = Array.from(path.matchAll(/\{([^}]+)\}/g), (match) => match[1])
+
+    for (const operation of Object.values(pathItem)) {
+      for (const name of parameterNames) {
+        expect(operation.parameters).toContainEqual({
+          name,
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        })
+      }
+    }
+  }
+}
 
 describe("Netopia deployment manifest", () => {
   it("publishes package-owned plugin metadata and source/publish exports", () => {
@@ -92,6 +112,8 @@ describe("Netopia deployment manifest", () => {
       Object.values(path).map((operation) => operation["x-voyant-api-id"]),
     )
     expect(apiIds).toEqual(Array.from({ length: 5 }, () => NETOPIA_ADMIN_OPENAPI_API_ID))
+    expectTemplatedPathsToDeclareParameters(document)
+    expectTemplatedPathsToDeclareParameters(netopiaAdminOpenApi)
   })
 
   it("points every runtime reference at a real package export", async () => {

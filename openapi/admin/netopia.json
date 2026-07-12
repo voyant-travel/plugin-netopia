@@ -8,6 +8,9 @@
     "/v1/admin/finance/providers/netopia/payment-sessions/{sessionId}/start": {
       "post": {
         "summary": "Start a Netopia payment session",
+        "parameters": [
+          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
           "201": { "description": "The payment session was started." },
           "404": { "description": "The payment session was not found." },
@@ -20,6 +23,10 @@
     "/v1/admin/finance/providers/netopia/bookings/{bookingId}/payment-schedules/{scheduleId}/collect": {
       "post": {
         "summary": "Collect a booking payment schedule through Netopia",
+        "parameters": [
+          { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "scheduleId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
           "201": { "description": "The collection payment session was created." },
           "404": { "description": "The payment schedule was not found." },
@@ -32,6 +39,10 @@
     "/v1/admin/finance/providers/netopia/bookings/{bookingId}/guarantees/{guaranteeId}/collect": {
       "post": {
         "summary": "Collect a booking guarantee through Netopia",
+        "parameters": [
+          { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "guaranteeId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
           "201": { "description": "The guarantee payment session was created." },
           "404": { "description": "The guarantee was not found." },
@@ -44,6 +55,9 @@
     "/v1/admin/finance/providers/netopia/invoices/{invoiceId}/collect": {
       "post": {
         "summary": "Collect an invoice through Netopia",
+        "parameters": [
+          { "name": "invoiceId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
         "responses": {
           "201": { "description": "The invoice payment session was created." },
           "404": { "description": "The invoice was not found." },

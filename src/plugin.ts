@@ -1,4 +1,4 @@
-import { OpenAPIHono } from "@hono/zod-openapi"
+import { OpenAPIHono, z } from "@hono/zod-openapi"
 import type { Extension, ModuleContainer } from "@voyant-travel/core"
 import {
   FINANCE_ROUTE_RUNTIME_CONTAINER_KEY,
@@ -262,10 +262,20 @@ export function createNetopiaFinanceRoutes(options: NetopiaRuntimeOptions = {}) 
     ],
     ["get", "/providers/netopia/config", "Read the public Netopia runtime configuration"],
   ] as const) {
+    const parameterNames = Array.from(path.matchAll(/\{([^}]+)\}/g), (match) => match[1])
+
     routes.openAPIRegistry.registerPath({
       method,
       path,
       summary,
+      request:
+        parameterNames.length > 0
+          ? {
+              params: z.object(
+                Object.fromEntries(parameterNames.map((name) => [name, z.string()])),
+              ),
+            }
+          : undefined,
       responses: { 200: { description: "Netopia finance operation response." } },
       "x-voyant-api-id": NETOPIA_ADMIN_OPENAPI_API_ID,
     })
