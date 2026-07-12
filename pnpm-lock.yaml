@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@hono/zod-openapi':
+        specifier: ^1.4.0
+        version: 1.4.0(hono@4.12.27)(zod@4.4.3)
       '@voyant-travel/core':
         specifier: ^0.111.0
         version: 0.111.0

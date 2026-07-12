@@ -1,0 +1,81 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Voyant Netopia Admin API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/admin/finance/providers/netopia/payment-sessions/{sessionId}/start": {
+      "post": {
+        "summary": "Start a Netopia payment session",
+        "parameters": [
+          { "name": "sessionId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "The payment session was started." },
+          "404": { "description": "The payment session was not found." },
+          "409": { "description": "The payment session cannot be started." },
+          "502": { "description": "Netopia rejected or failed the request." }
+        },
+        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+      }
+    },
+    "/v1/admin/finance/providers/netopia/bookings/{bookingId}/payment-schedules/{scheduleId}/collect": {
+      "post": {
+        "summary": "Collect a booking payment schedule through Netopia",
+        "parameters": [
+          { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "scheduleId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "The collection payment session was created." },
+          "404": { "description": "The payment schedule was not found." },
+          "409": { "description": "The payment schedule cannot be collected." },
+          "502": { "description": "Netopia rejected or failed the request." }
+        },
+        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+      }
+    },
+    "/v1/admin/finance/providers/netopia/bookings/{bookingId}/guarantees/{guaranteeId}/collect": {
+      "post": {
+        "summary": "Collect a booking guarantee through Netopia",
+        "parameters": [
+          { "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "guaranteeId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "The guarantee payment session was created." },
+          "404": { "description": "The guarantee was not found." },
+          "409": { "description": "The guarantee cannot be collected." },
+          "502": { "description": "Netopia rejected or failed the request." }
+        },
+        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+      }
+    },
+    "/v1/admin/finance/providers/netopia/invoices/{invoiceId}/collect": {
+      "post": {
+        "summary": "Collect an invoice through Netopia",
+        "parameters": [
+          { "name": "invoiceId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "201": { "description": "The invoice payment session was created." },
+          "404": { "description": "The invoice was not found." },
+          "409": { "description": "The invoice cannot be collected." },
+          "502": { "description": "Netopia rejected or failed the request." }
+        },
+        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+      }
+    },
+    "/v1/admin/finance/providers/netopia/config": {
+      "get": {
+        "summary": "Read the public Netopia runtime configuration",
+        "responses": {
+          "200": { "description": "The non-secret Netopia runtime configuration." },
+          "500": { "description": "Netopia runtime configuration is incomplete." }
+        },
+        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+      }
+    }
+  }
+}

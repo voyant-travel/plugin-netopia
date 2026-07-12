@@ -10,7 +10,8 @@
     "./service": "./src/service.ts",
     "./types": "./src/types.ts",
     "./validation": "./src/validation.ts",
-    "./voyant": "./src/voyant.ts"
+    "./voyant": "./src/voyant.ts",
+    "./openapi/admin": "./openapi/admin/netopia.json"
   },
   "scripts": {
     "typecheck": "NODE_OPTIONS=--max-old-space-size=14336 tsc --noEmit",
@@ -26,6 +27,7 @@
     "release": "pnpm build && changeset publish"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^1.4.0",
     "@voyant-travel/core": "^0.111.0",
     "@voyant-travel/finance": "^0.137.2",
     "@voyant-travel/hono": "^0.118.0",
@@ -42,7 +44,8 @@
     "vitest": "^4.1.9"
   },
   "files": [
-    "dist"
+    "dist",
+    "openapi"
   ],
   "publishConfig": {
     "access": "public",
@@ -81,7 +84,8 @@
         "types": "./dist/voyant.d.ts",
         "import": "./dist/voyant.js",
         "default": "./dist/voyant.js"
-      }
+      },
+      "./openapi/admin": "./openapi/admin/netopia.json"
     },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts"

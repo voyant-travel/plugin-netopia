@@ -1,3 +1,4 @@
+import { OpenAPIHono, z } from "@hono/zod-openapi"
 import type { Extension, ModuleContainer } from "@voyant-travel/core"
 import {
   FINANCE_ROUTE_RUNTIME_CONTAINER_KEY,
@@ -36,6 +37,7 @@ type Env = {
 }
 
 export const NETOPIA_RUNTIME_CONTAINER_KEY = "providers.netopia.runtime"
+export const NETOPIA_ADMIN_OPENAPI_API_ID = "@voyant-travel/plugin-netopia#api.admin"
 
 function getNetopiaRuntime(
   bindings: Record<string, unknown>,
@@ -119,7 +121,8 @@ export function createNetopiaFinanceRoutes(options: NetopiaRuntimeOptions = {}) 
     var: { container: ModuleContainer }
   }) => getNetopiaRuntime(c.env, options, (key) => c.var.container.resolve(key))
 
-  return new Hono<Env>()
+  const routes = new OpenAPIHono<Env>()
+  routes
     .post("/providers/netopia/payment-sessions/:sessionId/start", idempotencyKey(), async (c) => {
       try {
         const data = await parseJsonBody(c, netopiaStartPaymentSessionSchema)
@@ -235,6 +238,50 @@ export function createNetopiaFinanceRoutes(options: NetopiaRuntimeOptions = {}) 
         return c.json({ error: message }, 500)
       }
     })
+
+  for (const [method, path, summary] of [
+    [
+      "post",
+      "/providers/netopia/payment-sessions/{sessionId}/start",
+      "Start a Netopia payment session",
+    ],
+    [
+      "post",
+      "/providers/netopia/bookings/{bookingId}/payment-schedules/{scheduleId}/collect",
+      "Collect a booking payment schedule through Netopia",
+    ],
+    [
+      "post",
+      "/providers/netopia/bookings/{bookingId}/guarantees/{guaranteeId}/collect",
+      "Collect a booking guarantee through Netopia",
+    ],
+    [
+      "post",
+      "/providers/netopia/invoices/{invoiceId}/collect",
+      "Collect an invoice through Netopia",
+    ],
+    ["get", "/providers/netopia/config", "Read the public Netopia runtime configuration"],
+  ] as const) {
+    const parameterNames = Array.from(path.matchAll(/\{([^}]+)\}/g), (match) => match[1])
+
+    routes.openAPIRegistry.registerPath({
+      method,
+      path,
+      summary,
+      request:
+        parameterNames.length > 0
+          ? {
+              params: z.object(
+                Object.fromEntries(parameterNames.map((name) => [name, z.string()])),
+              ),
+            }
+          : undefined,
+      responses: { 200: { description: "Netopia finance operation response." } },
+      "x-voyant-api-id": NETOPIA_ADMIN_OPENAPI_API_ID,
+    })
+  }
+
+  return routes
 }
 
 /**

@@ -22,6 +22,9 @@ interface NetopiaVoyantPluginManifest {
     mount: string
     anonymous?: boolean
     transactional: boolean
+    openapi?: {
+      document: string
+    }
     runtime: {
       entry: string
       export: string
@@ -74,6 +77,7 @@ export const netopiaVoyantPlugin = {
       surface: "admin",
       mount: "finance",
       transactional: true,
+      openapi: { document: "netopia" },
       runtime: {
         entry: pluginId,
         export: "createNetopiaFinanceExtension",
