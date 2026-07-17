@@ -29,13 +29,13 @@
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.4.0",
-    "@voyant-travel/core": "^0.111.0",
-    "@voyant-travel/finance": "^0.137.2",
-    "@voyant-travel/hono": "^0.118.0",
-    "@voyant-travel/notifications": "^0.130.1",
-    "@voyant-travel/utils": "^0.105.4",
+    "@voyant-travel/core": "^0.125.0",
+    "@voyant-travel/finance": "^0.164.0",
+    "@voyant-travel/hono": "^0.128.1",
+    "@voyant-travel/notifications": "^0.130.4",
+    "@voyant-travel/utils": "^0.107.1",
     "drizzle-orm": "^0.45.2",
-    "hono": "^4.12.25",
+    "hono": "^4.12.27",
     "zod": "^4.4.3"
   },
   "devDependencies": {

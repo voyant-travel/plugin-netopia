@@ -4,13 +4,8 @@ import {
   FINANCE_ROUTE_RUNTIME_CONTAINER_KEY,
   type FinanceRouteRuntime,
 } from "@voyant-travel/finance"
-import {
-  defineHonoBundle,
-  type HonoBundle,
-  idempotencyKey,
-  parseJsonBody,
-} from "@voyant-travel/hono"
-import type { HonoExtension } from "@voyant-travel/hono/module"
+import { type ApiBundle, defineApiBundle, idempotencyKey, parseJsonBody } from "@voyant-travel/hono"
+import type { ApiExtension } from "@voyant-travel/hono/module"
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js"
 import type { MiddlewareHandler } from "hono"
 import { Hono } from "hono"
@@ -362,7 +357,7 @@ const netopiaFinanceExtensionDef: Extension = {
   module: "finance",
 }
 
-export function createNetopiaFinanceExtension(options: NetopiaRuntimeOptions = {}): HonoExtension {
+export function createNetopiaFinanceExtension(options: NetopiaRuntimeOptions = {}): ApiExtension {
   return {
     extension: netopiaFinanceExtensionDef,
     // Operator-initiated payment ops (start a session / collect an invoice / read
@@ -376,8 +371,8 @@ export function createNetopiaFinanceExtension(options: NetopiaRuntimeOptions = {
   }
 }
 
-export function netopiaHonoBundle(options: NetopiaRuntimeOptions = {}): HonoBundle {
-  return defineHonoBundle({
+export function netopiaHonoBundle(options: NetopiaRuntimeOptions = {}): ApiBundle {
+  return defineApiBundle({
     name: "netopia",
     version: "0.1.0",
     bootstrap: ({ bindings, container }) => {
