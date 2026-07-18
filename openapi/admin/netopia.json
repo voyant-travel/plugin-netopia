@@ -17,7 +17,7 @@
           "409": { "description": "The payment session cannot be started." },
           "502": { "description": "Netopia rejected or failed the request." }
         },
-        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+        "x-voyant-api-id": "@voyant-travel/netopia-adapter#api.admin"
       }
     },
     "/v1/admin/finance/providers/netopia/bookings/{bookingId}/payment-schedules/{scheduleId}/collect": {
@@ -33,7 +33,7 @@
           "409": { "description": "The payment schedule cannot be collected." },
           "502": { "description": "Netopia rejected or failed the request." }
         },
-        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+        "x-voyant-api-id": "@voyant-travel/netopia-adapter#api.admin"
       }
     },
     "/v1/admin/finance/providers/netopia/bookings/{bookingId}/guarantees/{guaranteeId}/collect": {
@@ -49,7 +49,7 @@
           "409": { "description": "The guarantee cannot be collected." },
           "502": { "description": "Netopia rejected or failed the request." }
         },
-        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+        "x-voyant-api-id": "@voyant-travel/netopia-adapter#api.admin"
       }
     },
     "/v1/admin/finance/providers/netopia/invoices/{invoiceId}/collect": {
@@ -64,7 +64,7 @@
           "409": { "description": "The invoice cannot be collected." },
           "502": { "description": "Netopia rejected or failed the request." }
         },
-        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+        "x-voyant-api-id": "@voyant-travel/netopia-adapter#api.admin"
       }
     },
     "/v1/admin/finance/providers/netopia/config": {
@@ -74,7 +74,7 @@
           "200": { "description": "The non-secret Netopia runtime configuration." },
           "500": { "description": "Netopia runtime configuration is incomplete." }
         },
-        "x-voyant-api-id": "@voyant-travel/plugin-netopia#api.admin"
+        "x-voyant-api-id": "@voyant-travel/netopia-adapter#api.admin"
       }
     }
   }

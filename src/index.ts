@@ -1,3 +1,9 @@
+export {
+  createNetopiaPaymentAdapter,
+  NETOPIA_PAYMENT_ADAPTER_ID,
+  type NetopiaPaymentAdapterOptions,
+  netopiaPaymentAdapter,
+} from "./adapter.js"
 export { netopiaCardPaymentStarter } from "./card-payment-starter.js"
 export { createNetopiaCheckoutStarter } from "./checkout.js"
 export {

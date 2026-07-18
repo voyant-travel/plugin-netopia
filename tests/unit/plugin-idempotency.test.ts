@@ -94,7 +94,7 @@ function createIdempotencyDbFake() {
   }
 }
 
-function buildApp() {
+function buildApp(options = runtimeOptions) {
   const db = createIdempotencyDbFake()
   const container = createContainer()
   const app = new Hono().use("*", async (c, next) => {
@@ -102,8 +102,8 @@ function buildApp() {
     c.set("container", container as never)
     await next()
   })
-  app.route("/", createNetopiaFinanceRoutes(runtimeOptions))
-  app.route("/", createNetopiaFinanceWebhookRoutes(runtimeOptions))
+  app.route("/", createNetopiaFinanceRoutes(options))
+  app.route("/", createNetopiaFinanceWebhookRoutes(options))
   return { app, db }
 }
 
@@ -131,6 +131,25 @@ afterEach(() => {
 })
 
 describe("netopia callback — provider-event dedup", () => {
+  it("rejects unsigned callbacks before they can mutate payment sessions", async () => {
+    const completeSpy = vi.spyOn(financeService, "completePaymentSession")
+    const { app, db } = buildApp({
+      ...runtimeOptions,
+      trustUnverifiedCallbacks: false,
+      ipnPublicKey: "public-key",
+    })
+
+    const res = await postCallback(app)
+
+    expect(res.status).toBe(401)
+    expect(await res.json()).toMatchObject({
+      error: "Netopia callback verification failed",
+      code: "missing_verification_token",
+    })
+    expect(completeSpy).not.toHaveBeenCalled()
+    expect(db.rows).toHaveLength(0)
+  })
+
   it("processes a duplicate callback (same ntpID + status) exactly once and replays the stored response", async () => {
     vi.spyOn(financeService, "listPaymentSessions").mockResolvedValue({
       data: [{ ...baseSession }],

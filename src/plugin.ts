@@ -32,7 +32,7 @@ type Env = {
 }
 
 export const NETOPIA_RUNTIME_CONTAINER_KEY = "providers.netopia.runtime"
-export const NETOPIA_ADMIN_OPENAPI_API_ID = "@voyant-travel/plugin-netopia#api.admin"
+export const NETOPIA_ADMIN_OPENAPI_API_ID = "@voyant-travel/netopia-adapter#api.admin"
 
 function getNetopiaRuntime(
   bindings: Record<string, unknown>,

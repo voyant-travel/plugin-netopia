@@ -1,4 +1,4 @@
-# `@voyant-travel/plugin-netopia`
+# `@voyant-travel/netopia-adapter`
 
 Netopia hosted-card payment adapter bundle for Voyant finance.
 
@@ -19,13 +19,20 @@ authorizations, invoices, and booking payment schedules.
 
 The default finance extension resolves its runtime config from:
 
-- `NETOPIA_URL`
-- `NETOPIA_API_KEY`
-- `NETOPIA_POS_SIGNATURE`
+- `NETOPIA_PRIVATE_KEY` (legacy alias: `NETOPIA_API_KEY`)
+- `NETOPIA_MERCHANT_ID` (legacy alias: `NETOPIA_POS_SIGNATURE`)
+- `NETOPIA_PUBLIC_KEY` (legacy alias: `NETOPIA_IPN_PUBLIC_KEY`)
+- `NETOPIA_SANDBOX`
 - `NETOPIA_NOTIFY_URL`
 - `NETOPIA_REDIRECT_URL`
+- `NETOPIA_URL` (optional API base override)
 
 You can also override these programmatically via `createNetopiaFinanceExtension(options)`.
+
+The package also exports `createNetopiaPaymentAdapter()` for the canonical
+`voyant.payment-adapter.v1` runtime contract from `@voyant-travel/payments`.
+The package graph manifest declares it on port `payments.adapter.runtime` with
+selection `{ role: "payments", value: "netopia" }`.
 
 ## Routes
 
@@ -51,7 +58,7 @@ path in the app.
 ## Usage
 
 ```ts
-import { createNetopiaFinanceAdapter } from "@voyant-travel/plugin-netopia"
+import { createNetopiaFinanceAdapter } from "@voyant-travel/netopia-adapter"
 
 const netopiaFinanceExtension = createNetopiaFinanceAdapter()
 ```
@@ -76,5 +83,6 @@ finance extension remain the main runtime seams.
 
 - Successful Netopia statuses default to `3` and `5`.
 - In-flight statuses default to `1` and `15`.
-- The callback path is idempotent for already-completed sessions.
+- The callback path requires signed Netopia callbacks by default and is
+  idempotent for already-completed sessions.
 - Amount/currency mismatch on a supposedly successful callback fails the session instead of silently accepting it.

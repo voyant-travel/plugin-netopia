@@ -12,7 +12,7 @@ describe("Netopia deployment manifest import boundary", () => {
   it("loads without importing route or service bodies", async () => {
     const manifestNamespace = await import("../../src/voyant.js")
 
-    expect(manifestNamespace.default).toBe(manifestNamespace.netopiaVoyantPlugin)
-    expect(manifestNamespace.default.schemaVersion).toBe("voyant.plugin.v1")
+    expect(manifestNamespace.default).toBe(manifestNamespace.netopiaVoyantAdapter)
+    expect(manifestNamespace.default.schemaVersion).toBe("voyant.adapter.v1")
   })
 })

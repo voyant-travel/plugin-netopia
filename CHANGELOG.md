@@ -1,4 +1,4 @@
-# @voyant-travel/plugin-netopia
+# @voyant-travel/netopia-adapter
 
 ## 0.105.23
 

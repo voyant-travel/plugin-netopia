@@ -6,8 +6,8 @@ import { promisify } from "node:util"
 
 const execFileAsync = promisify(execFile)
 const rootDir = process.cwd()
-const packDir = mkdtempSync(path.join(tmpdir(), "plugin-netopia-pack-"))
-const consumerDir = mkdtempSync(path.join(tmpdir(), "plugin-netopia-consumer-"))
+const packDir = mkdtempSync(path.join(tmpdir(), "netopia-adapter-pack-"))
+const consumerDir = mkdtempSync(path.join(tmpdir(), "netopia-adapter-consumer-"))
 
 try {
   const { stdout } = await execFileAsync(
@@ -23,7 +23,7 @@ try {
     path.join(consumerDir, "package.json"),
     `${JSON.stringify(
       {
-        name: "plugin-netopia-external-consumer",
+        name: "netopia-adapter-external-consumer",
         version: "0.0.0",
         private: true,
         dependencies: { [packInfo.name]: `file:${tarballPath}` },
