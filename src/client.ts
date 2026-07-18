@@ -98,16 +98,24 @@ export function resolveNetopiaRuntimeOptions(
 ): ResolvedNetopiaRuntimeOptions {
   const env = bindings ?? {}
   const apiUrlOverride = options.apiUrl ?? coerceString(env.NETOPIA_URL)
-  const mode = resolveMode(options.mode ?? coerceString(env.NETOPIA_MODE))
+  const mode = resolveMode(
+    options.mode ?? coerceString(env.NETOPIA_MODE) ?? resolveSandboxMode(env.NETOPIA_SANDBOX),
+  )
   const apiUrl = apiUrlOverride ?? NETOPIA_API_BASES[mode]
-  const apiKey = options.apiKey ?? coerceString(env.NETOPIA_API_KEY)
-  const posSignature = options.posSignature ?? coerceString(env.NETOPIA_POS_SIGNATURE)
+  const apiKey =
+    options.apiKey ?? coerceString(env.NETOPIA_API_KEY) ?? coerceString(env.NETOPIA_PRIVATE_KEY)
+  const posSignature =
+    options.posSignature ??
+    coerceString(env.NETOPIA_POS_SIGNATURE) ??
+    coerceString(env.NETOPIA_MERCHANT_ID)
   const notifyUrl = options.notifyUrl ?? coerceString(env.NETOPIA_NOTIFY_URL)
   const redirectUrl = options.redirectUrl ?? coerceString(env.NETOPIA_REDIRECT_URL)
   // PEM material is often stored as a single-line env var with literal `\n`
   // escapes — normalize those back into real newlines.
   const ipnPublicKey = (
-    options.ipnPublicKey ?? coerceString(env.NETOPIA_IPN_PUBLIC_KEY)
+    options.ipnPublicKey ??
+    coerceString(env.NETOPIA_PUBLIC_KEY) ??
+    coerceString(env.NETOPIA_IPN_PUBLIC_KEY)
   )?.replaceAll("\\n", "\n")
   const trustUnverifiedCallbacks =
     options.trustUnverifiedCallbacks ?? coerceBoolean(env.NETOPIA_TRUST_UNVERIFIED_CALLBACKS)
@@ -159,6 +167,12 @@ function coerceBoolean(value: unknown): boolean | undefined {
     if (normalized === "0" || normalized === "false" || normalized === "") return false
   }
   return undefined
+}
+
+function resolveSandboxMode(value: unknown): NetopiaMode | undefined {
+  const sandbox = coerceBoolean(value)
+  if (sandbox === undefined) return undefined
+  return sandbox ? "sandbox" : "live"
 }
 
 function resolveMode(raw: string | undefined): NetopiaMode {

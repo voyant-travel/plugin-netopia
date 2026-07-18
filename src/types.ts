@@ -242,7 +242,8 @@ export interface NetopiaRuntimeOptions {
    * verify the `Verification-token` JWT that Netopia v2 attaches to every
    * IPN callback. When set, callbacks with a missing/invalid token are
    * rejected before any verification or state transition. Env:
-   * `NETOPIA_IPN_PUBLIC_KEY` (literal `\n` sequences are unescaped).
+   * `NETOPIA_PUBLIC_KEY` (or legacy `NETOPIA_IPN_PUBLIC_KEY`; literal `\n`
+   * sequences are unescaped).
    */
   ipnPublicKey?: string
   /**
