@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "voyant-netopia-worker",
+  "main": "index.ts",
+  "compatibility_date": "2025-10-03",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true }
+  // ORIGIN_TRUST_SECRET is a deploy-time secret (`wrangler secret put`), shared
+  // with the payments control plane so only it can invoke this worker. Deploy
+  // into the payments dispatch namespace so the control plane reaches it by
+  // binding. `wrangler` is not a repo dependency — deploy with `npx wrangler`.
+}

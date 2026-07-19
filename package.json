@@ -16,6 +16,7 @@
   },
   "scripts": {
     "typecheck": "NODE_OPTIONS=--max-old-space-size=14336 tsc --noEmit",
+    "typecheck:worker": "tsc -p worker/tsconfig.json",
     "check-types": "pnpm typecheck",
     "lint": "biome check .",
     "format": "biome check --write .",
