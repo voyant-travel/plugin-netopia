@@ -12,5 +12,5 @@
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["**/*"]
+  "include": ["index.ts", "worker-configuration.d.ts"]
 }

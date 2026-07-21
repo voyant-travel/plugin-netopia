@@ -86,3 +86,10 @@ finance extension remain the main runtime seams.
 - The callback path requires signed Netopia callbacks by default and is
   idempotent for already-completed sessions.
 - Amount/currency mismatch on a supposedly successful callback fails the session instead of silently accepting it.
+
+## Managed processor Worker
+
+The isolated Cloudflare Worker used by Voyant Cloud lives in `worker/`. Its staging/production
+deployment, trust-secret setup, readiness checks, callback requirements, and rollback procedure are
+documented in [Managed Netopia Worker deployment](docs/managed-worker-deployment.md). The managed
+control plane must configure the full Worker `/rpc` URL; `/health` and `/readyz` are public probes.

@@ -26,6 +26,14 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Worker binding types from the deployment config
+        run: pnpm worker:cf:types
+
+      - name: Validate Worker deployment shapes
+        run: |
+          pnpm worker:deploy:dry-run:staging
+          pnpm worker:deploy:dry-run:production
+
       - name: Type check
         run: pnpm typecheck
 

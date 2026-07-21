@@ -33,6 +33,13 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/.changeset", "!**/*.gen.ts"]
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/.changeset",
+      "!**/*.gen.ts",
+      "!worker/worker-configuration.d.ts"
+    ]
   }
 }

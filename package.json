@@ -17,6 +17,10 @@
   "scripts": {
     "typecheck": "NODE_OPTIONS=--max-old-space-size=14336 tsc --noEmit",
     "typecheck:worker": "tsc -p worker/tsconfig.json",
+    "worker:cf:types": "pnpm dlx wrangler@4.112.0 types worker/worker-configuration.d.ts --config worker/wrangler.jsonc --include-runtime false",
+    "worker:cf:types:check": "pnpm dlx wrangler@4.112.0 types worker/worker-configuration.d.ts --config worker/wrangler.jsonc --include-runtime false --check",
+    "worker:deploy:dry-run:staging": "pnpm dlx wrangler@4.112.0 deploy --dry-run --config worker/wrangler.jsonc --env staging --outdir dist/worker-staging",
+    "worker:deploy:dry-run:production": "pnpm dlx wrangler@4.112.0 deploy --dry-run --config worker/wrangler.jsonc --env production --outdir dist/worker-production",
     "check-types": "pnpm typecheck",
     "lint": "biome check .",
     "format": "biome check --write .",

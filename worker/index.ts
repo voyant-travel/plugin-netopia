@@ -19,13 +19,11 @@ import { z } from "zod"
 
 import { createNetopiaPaymentAdapter } from "../src/adapter.js"
 
-interface Env {
-  /** Shared trust secret; must match the control plane's per-worker secret. */
-  ORIGIN_TRUST_SECRET: string
-}
+type RuntimeEnv = Cloudflare.StagingEnv | Cloudflare.ProductionEnv
 
 /** Header carrying the trust secret (mirrors the dispatcher origin convention). */
 const TRUST_HEADER = "x-voyant-origin-trust"
+const MAX_RPC_BODY_BYTES = 256 * 1024
 
 const modeSchema = z.enum(["sandbox", "test", "live"])
 const credentialsSchema = z.record(z.string(), z.unknown())
@@ -126,18 +124,56 @@ function credentialsToEnv(
   }
 }
 
-const app = new Hono<{ Bindings: Env }>()
+const app = new Hono<{ Bindings: RuntimeEnv; Variables: { requestId: string } }>()
 
-app.get("/health", (c) => c.json({ ok: true }))
+app.use("*", async (c, next) => {
+  const requestId = c.req.header("x-request-id")?.trim() || crypto.randomUUID()
+  c.set("requestId", requestId)
+  c.header("x-request-id", requestId)
+  await next()
+})
+
+app.get("/health", (c) =>
+  c.json({
+    ok: true,
+    service: "voyant-netopia-worker",
+    environment: c.env.VOYANT_ENVIRONMENT,
+  }),
+)
+
+app.get("/readyz", (c) => {
+  const ready = Boolean(c.env.ORIGIN_TRUST_SECRET?.trim())
+  return c.json(
+    {
+      status: ready ? "ready" : "not_ready",
+      checks: { originTrustSecret: ready },
+      environment: c.env.VOYANT_ENVIRONMENT,
+    },
+    ready ? 200 : 503,
+  )
+})
 
 app.post("/rpc", async (c) => {
   const trust = c.req.header(TRUST_HEADER)
-  if (!c.env.ORIGIN_TRUST_SECRET || trust !== c.env.ORIGIN_TRUST_SECRET) {
+  if (!trust || !(await secretsMatch(trust, c.env.ORIGIN_TRUST_SECRET))) {
+    logError(c, "netopia_rpc.unauthorized")
     return c.json({ ok: false, error: "Unauthorized." }, 401)
   }
 
-  const parsed = rpcRequestSchema.safeParse(await c.req.json().catch(() => null))
+  const body = await readBoundedJson(c.req.raw, MAX_RPC_BODY_BYTES)
+  if (!body.ok) {
+    logError(c, "netopia_rpc.invalid_body", { reason: body.reason })
+    return c.json(
+      {
+        ok: false,
+        error: body.reason === "too_large" ? "Request too large." : "Malformed request.",
+      },
+      body.reason === "too_large" ? 413 : 400,
+    )
+  }
+  const parsed = rpcRequestSchema.safeParse(body.value)
   if (!parsed.success) {
+    logError(c, "netopia_rpc.invalid_envelope")
     return c.json({ ok: false, error: "Malformed request." }, 400)
   }
 
@@ -231,11 +267,85 @@ app.post("/rpc", async (c) => {
       }
     }
   } catch (error) {
+    logError(c, "netopia_rpc.failed", {
+      operation: req.op,
+      errorType: error instanceof Error ? error.name : "UnknownError",
+    })
     return c.json({
       ok: false,
-      error: error instanceof Error ? error.message : "Netopia RPC failed.",
+      error: "Netopia RPC failed.",
     })
   }
 })
 
 export default app
+
+async function secretsMatch(provided: string, expected: string | undefined): Promise<boolean> {
+  if (!expected) return false
+  const encoder = new TextEncoder()
+  const [providedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest("SHA-256", encoder.encode(provided)),
+    crypto.subtle.digest("SHA-256", encoder.encode(expected)),
+  ])
+  return fixedTimeEqual(providedHash, expectedHash)
+}
+
+function fixedTimeEqual(left: ArrayBuffer, right: ArrayBuffer): boolean {
+  const leftBytes = new Uint8Array(left)
+  const rightBytes = new Uint8Array(right)
+  let mismatch = leftBytes.byteLength ^ rightBytes.byteLength
+  const length = Math.max(leftBytes.byteLength, rightBytes.byteLength)
+  for (let index = 0; index < length; index += 1) {
+    mismatch |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0)
+  }
+  return mismatch === 0
+}
+
+async function readBoundedJson(
+  request: Request,
+  limit: number,
+): Promise<{ ok: true; value: unknown } | { ok: false; reason: "too_large" | "invalid_body" }> {
+  if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
+    return { ok: false, reason: "invalid_body" }
+  }
+  const declared = request.headers.get("content-length")
+  if (declared !== null && (!/^\d+$/.test(declared) || Number(declared) > limit)) {
+    return { ok: false, reason: "too_large" }
+  }
+  if (!request.body) return { ok: false, reason: "invalid_body" }
+
+  const reader = request.body.getReader()
+  const chunks: Uint8Array[] = []
+  let length = 0
+  try {
+    while (true) {
+      const next = await reader.read()
+      if (next.done) break
+      length += next.value.byteLength
+      if (length > limit) {
+        await reader.cancel()
+        return { ok: false, reason: "too_large" }
+      }
+      chunks.push(next.value)
+    }
+    const bytes = new Uint8Array(length)
+    let offset = 0
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset)
+      offset += chunk.byteLength
+    }
+    return { ok: true, value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) }
+  } catch {
+    return { ok: false, reason: "invalid_body" }
+  }
+}
+
+function logError(
+  c: { get(key: "requestId"): string },
+  event: string,
+  details: Record<string, string> = {},
+) {
+  console.error(
+    JSON.stringify({ level: "error", event, requestId: c.get("requestId"), ...details }),
+  )
+}

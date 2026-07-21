@@ -1,12 +1,35 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "voyant-netopia-worker",
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "deploy-with-explicit-environment-voyant-netopia-worker",
   "main": "index.ts",
-  "compatibility_date": "2025-10-03",
+  "compatibility_date": "2026-07-21",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": { "enabled": true }
-  // ORIGIN_TRUST_SECRET is a deploy-time secret (`wrangler secret put`), shared
-  // with the payments control plane so only it can invoke this worker. Deploy
-  // into the payments dispatch namespace so the control plane reaches it by
-  // binding. `wrangler` is not a repo dependency — deploy with `npx wrangler`.
+  "workers_dev": false,
+  "preview_urls": false,
+  "env": {
+    "staging": {
+      "name": "voyant-netopia-worker-staging",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": { "VOYANT_ENVIRONMENT": "staging" },
+      "secrets": { "required": ["ORIGIN_TRUST_SECRET"] },
+      "observability": {
+        "enabled": true,
+        "logs": { "enabled": true, "head_sampling_rate": 1 },
+        "traces": { "enabled": true, "head_sampling_rate": 0.1 }
+      }
+    },
+    "production": {
+      "name": "voyant-netopia-worker",
+      "workers_dev": true,
+      "preview_urls": false,
+      "vars": { "VOYANT_ENVIRONMENT": "production" },
+      "secrets": { "required": ["ORIGIN_TRUST_SECRET"] },
+      "observability": {
+        "enabled": true,
+        "logs": { "enabled": true, "head_sampling_rate": 0.25 },
+        "traces": { "enabled": true, "head_sampling_rate": 0.05 }
+      }
+    }
+  }
 }
