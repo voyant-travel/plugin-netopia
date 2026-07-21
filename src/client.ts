@@ -268,7 +268,9 @@ export function createNetopiaClient(options: NetopiaClientOptions): NetopiaClien
       // this fails) is the recovery mechanism, not client-side retries.
       const res = await request("POST", "/operation/status", requestBody)
       const json = (res.json ?? {}) as NetopiaStatusResponse
-      if (!res.ok || json.error) {
+      // NETOPIA signals a successful lookup with `error.code === "00"`
+      // ("Approved") — that is NOT a failure; only other codes are.
+      if (!res.ok || (json.error && json.error.code !== "00")) {
         const detail =
           json.error?.message ??
           (res.status === 404
